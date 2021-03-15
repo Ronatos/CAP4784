@@ -130,3 +130,6 @@ dmypy.json
 
 # Development Environments
 .vscode/
+
+# Data folder
+data/
