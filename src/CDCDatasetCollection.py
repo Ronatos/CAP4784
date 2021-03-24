@@ -3,11 +3,15 @@
 #
 # Alex Derby for Team Eva - CAP 4784 Data Analytics
 
-import pandas as pd
 import numpy as np
+import os
+import pandas as pd
 from scipy import stats
 
-data = pd.read_csv('Provisional_COVID-19_Death_Counts_by_Sex__Age__and_State.csv')
+contributing_conditions_dataset_filepath = os.path.join(os.getcwd(), "data/Conditions_contributing_to_deaths_involving_coronavirus_disease_2019__COVID-19___by_age_group_and_state__United_States..csv")
+sex_age_state_dataset_filepath = os.path.join(os.getcwd(), "Provisional_COVID-19_Death_Counts_by_Sex__Age__and_State.csv")
+
+data = pd.read_csv(contributing_conditions_dataset_filepath)
 
 columns = {
     0: 'COVID-19 Deaths',
