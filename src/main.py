@@ -39,73 +39,115 @@
 import numpy as np
 import os
 import pandas as pd
+import csv
 from scipy import stats
 
 # Consult README.md for instructions setting up the data folder
 contributing_conditions_dataset_filepath = os.path.join(os.getcwd(), "data/Conditions_contributing_to_deaths_involving_coronavirus_disease_2019__COVID-19___by_age_group_and_state__United_States..csv")
 sex_age_state_dataset_filepath = os.path.join(os.getcwd(), "Provisional_COVID-19_Death_Counts_by_Sex__Age__and_State.csv")
 
-data = pd.read_csv(contributing_conditions_dataset_filepath)
+data = pd.read_csv(sex_age_state_dataset_filepath)
 
 # Program works up to here
+# --------------- For Provisional COVID-19 Death Counts by Sex, Age, and State dataset ---------------
+data.rename(columns={"Age Group": "Age_Group"}, inplace = True)
 
-columns = {
-    0: 'COVID-19 Deaths',
-    1: 'Pneumonia Deaths',
-    2: 'Influenza Deaths',
-    3: 'Pneumonia and COVID-19 Deaths'
+age_groups = {
+    0: 'All Ages',
+    1: 'Under 1 year',
+    2: '0-17 years',
+    3: '1-4 years',
+    4: '5-14 years',
+    5: '15-24 years',
+    6: '18-29 years',
+    7: '25-34 years',
+    8: '30-39 years',
+    9: '35-44 years',
+    10: '40-49 years',
+    11: '45-54 years',
+    12: '50-64 years',
+    13: '55-64 years',
+    14: '65-74 years',
+    15: '75-84 years',
+    16: '85 years and over'
 }
 
-age_groups = { 0: '0-24', 1: '25-44', 2: '45-64', 3: '65+'}
+covid_deaths_array = []
+pneumonia_deaths_array = []
+influenza_deaths_array = []
+pneumonia_and_covid_deaths_array = []
+pneumonia_influenza_or_covid_array = []
+total_deaths_array = []
+results_array = []
 
-rows = [data.iloc[1:6], data.iloc[6:10], data.iloc[10:14], data.iloc[14:17]]
+# Get values from CSV. Each death type list holds lists of values from each age group
+for x in range(len(age_groups)):
+    covid_deaths_array.append(data.loc[(data.Group == 'By Total') & (data.State != 'United States') & (data.Sex == 'All Sexes') & (data.Age_Group == age_groups.get(x))].loc[:, 'COVID-19 Deaths'])
+    pneumonia_deaths_array.append(data.loc[(data.Group == 'By Total') & (data.State != 'United States') & (data.Sex == 'All Sexes') & (data.Age_Group == age_groups.get(x))].loc[:, 'Pneumonia Deaths'])
+    influenza_deaths_array.append(data.loc[(data.Group == 'By Total') & (data.State != 'United States') & (data.Sex == 'All Sexes') & (data.Age_Group == age_groups.get(x))].loc[:, 'Influenza Deaths'])
+    pneumonia_and_covid_deaths_array.append(data.loc[(data.Group == 'By Total') & (data.State != 'United States') & (data.Sex == 'All Sexes') & (data.Age_Group == age_groups.get(x))].loc[:, 'Pneumonia and COVID-19 Deaths'])
+    pneumonia_influenza_or_covid_array.append(data.loc[(data.Group == 'By Total') & (data.State != 'United States') & (data.Sex == 'All Sexes') & (data.Age_Group == age_groups.get(x))].loc[:, 'Pneumonia, Influenza, or COVID-19 Deaths'])
+    total_deaths_array.append(data.loc[(data.Group == 'By Total') & (data.State != 'United States') & (data.Sex == 'All Sexes') & (data.Age_Group == age_groups.get(x))].loc[:, 'Total Deaths'])
 
-median_arr = np.zeros((4,4))
-# mode_arr = np.zeros((4,4))
-mean_arr = np.zeros((4,4))
-range_arr = np.zeros((4,4))
-variance_arr = np.zeros((4,4))
-standard_deviation_arr = np.zeros((4,4))
+def performstats(input):
+    global results_array
+    results_array = []
+    for x in range(len(input)):
+        y = []
+        y.append(age_groups.get(x))
+        #Median
+        y.append(np.nanmedian(input[x].values.tolist()))
+        #Mean
+        y.append(np.nanmean(input[x].values.tolist()))
+        #Range
+        y.append(np.ptp(input[x].values.tolist()))
+        #Variance
+        y.append(np.nanvar(input[x].values.tolist()))
+        #First Quartile
+        y.append(np.nanmedian(input[x].quantile(.25)))
+        #Third Quartile
+        y.append(np.nanmedian(input[x].quantile(.75)))
+        #Standard Deviation
+        y.append(np.nanstd(input[x].values.tolist()))
+        results_array.append(y)
 
-# Get median
-for x in range(len(rows)):
-    print('Median for ages ' + str(age_groups.get(x)))
-    row = rows[x]
-    for y in range(len(columns)):
-        median_arr[x][y] = np.median(row.loc[:,columns.get(y)].values.tolist())
-        print(str(median_arr[x][y]), end=" ")
-    print()
-print()
+#Testing CSV file write
+header = ['Median', 'Mean', 'Range', 'Variance', '1st Quartile', '3rd Quartile', 'Standard Deviation']
 
-# Get Mean
-for x in range(len(rows)):
-    print('Mean for ages ' + str(age_groups.get(x)))
-    row = rows[x]
-    for y in range(len(columns)):
-        mean_arr[x][y] = np.mean(row.loc[:,columns.get(y)].values.tolist())
-        print(mean_arr[x][y], end=" ")
-    print()
-print()
+performstats(covid_deaths_array)
+with open('Provisional_COVID-19_Death_Counts_by_Sex__Age__and_State_COVID-19_Deaths_Analysis.csv', 'w', newline='') as f:
+    writer = csv.writer(f)
+    writer.writerow(header)
+    writer.writerows(results_array)
 
-# Get Range
-for x in range(len(rows)):
-    print('Range for ages ' + str(age_groups.get(x)))
-    row = rows[x]
-    for y in range(len(columns)):
-        range_arr[x][y] = np.ptp(row.loc[:,columns.get(y)].values.tolist())
-        print(range_arr[x][y], end=" ")
-    print()
-print()
+performstats(pneumonia_deaths_array)
+with open('Provisional_COVID-19_Death_Counts_by_Sex__Age__and_State_Pneumonia_Deaths_Analysis.csv', 'w', newline='') as f:
+    writer = csv.writer(f)
+    writer.writerow(header)
+    writer.writerows(results_array)
 
-# Get Vairance
+performstats(influenza_deaths_array)
+with open('Provisional_COVID-19_Death_Counts_by_Sex__Age__and_State_Influenza_Deaths_Analysis.csv', 'w', newline='') as f:
+    writer = csv.writer(f)
+    writer.writerow(header)
+    writer.writerows(results_array)
 
-# Get Quartiles
+performstats(pneumonia_and_covid_deaths_array)
+with open('Provisional_COVID-19_Death_Counts_by_Sex__Age__and_State_Pneumonia_and_COVID-19_Deaths_Analysis.csv', 'w', newline='') as f:
+    writer = csv.writer(f)
+    writer.writerow(header)
+    writer.writerows(results_array)
 
-# Get Standard Deviation
-for x in range(len(rows)):
-    print('Standard Deviaton for ages ' + str(age_groups.get(x)))
-    row = rows[x]
-    for y in range(len(columns)):
-        standard_deviation_arr[x][y] = np.std(row.loc[:,columns.get(y)].values.tolist())
-        print(standard_deviation_arr[x][y], end=" ")
-    print()
+performstats(pneumonia_influenza_or_covid_array)
+with open('Provisional_COVID-19_Death_Counts_by_Sex__Age__and_State_Pneumonia_Influenza_or_COVID-19_Deaths_Analysis.csv', 'w', newline='') as f:
+    writer = csv.writer(f)
+    writer.writerow(header)
+    writer.writerows(results_array)
+
+performstats(total_deaths_array)
+with open('Provisional_COVID-19_Death_Counts_by_Sex__Age__and_State_Total_Deaths_Analysis.csv', 'w', newline='') as f:
+    writer = csv.writer(f)
+    writer.writerow(header)
+    writer.writerows(results_array)
+
+# ---------------------------------------------------------------------------------------------------------
