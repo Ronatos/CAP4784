@@ -132,4 +132,5 @@ dmypy.json
 .vscode/
 
 # Data folder
-data/
+data/Conditions_contributing_to_deaths_involving_coronavirus_disease_2019__COVID-19___by_age_group_and_state__United_States..csv
+data/Provisional_COVID-19_Death_Counts_by_Sex__Age__and_State.csv
