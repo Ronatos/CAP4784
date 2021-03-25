@@ -44,7 +44,7 @@ from scipy import stats
 
 # Consult README.md for instructions setting up the data folder
 contributing_conditions_dataset_filepath = os.path.join(os.getcwd(), "data/Conditions_contributing_to_deaths_involving_coronavirus_disease_2019__COVID-19___by_age_group_and_state__United_States..csv")
-sex_age_state_dataset_filepath = os.path.join(os.getcwd(), "Provisional_COVID-19_Death_Counts_by_Sex__Age__and_State.csv")
+sex_age_state_dataset_filepath = os.path.join(os.getcwd(), "data/Provisional_COVID-19_Death_Counts_by_Sex__Age__and_State.csv")
 
 data = pd.read_csv(sex_age_state_dataset_filepath)
 
@@ -115,37 +115,37 @@ def performstats(input):
 header = ['Median', 'Mean', 'Range', 'Variance', '1st Quartile', '3rd Quartile', 'Standard Deviation']
 
 performstats(covid_deaths_array)
-with open('Provisional_COVID-19_Death_Counts_by_Sex__Age__and_State_COVID-19_Deaths_Analysis.csv', 'w', newline='') as f:
+with open('data/Provisional_COVID-19_Death_Counts_by_Sex__Age__and_State_COVID-19_Deaths_Analysis.csv', 'w', newline='') as f:
     writer = csv.writer(f)
     writer.writerow(header)
     writer.writerows(results_array)
 
 performstats(pneumonia_deaths_array)
-with open('Provisional_COVID-19_Death_Counts_by_Sex__Age__and_State_Pneumonia_Deaths_Analysis.csv', 'w', newline='') as f:
+with open('data/Provisional_COVID-19_Death_Counts_by_Sex__Age__and_State_Pneumonia_Deaths_Analysis.csv', 'w', newline='') as f:
     writer = csv.writer(f)
     writer.writerow(header)
     writer.writerows(results_array)
 
 performstats(influenza_deaths_array)
-with open('Provisional_COVID-19_Death_Counts_by_Sex__Age__and_State_Influenza_Deaths_Analysis.csv', 'w', newline='') as f:
+with open('data/Provisional_COVID-19_Death_Counts_by_Sex__Age__and_State_Influenza_Deaths_Analysis.csv', 'w', newline='') as f:
     writer = csv.writer(f)
     writer.writerow(header)
     writer.writerows(results_array)
 
 performstats(pneumonia_and_covid_deaths_array)
-with open('Provisional_COVID-19_Death_Counts_by_Sex__Age__and_State_Pneumonia_and_COVID-19_Deaths_Analysis.csv', 'w', newline='') as f:
+with open('data/Provisional_COVID-19_Death_Counts_by_Sex__Age__and_State_Pneumonia_and_COVID-19_Deaths_Analysis.csv', 'w', newline='') as f:
     writer = csv.writer(f)
     writer.writerow(header)
     writer.writerows(results_array)
 
 performstats(pneumonia_influenza_or_covid_array)
-with open('Provisional_COVID-19_Death_Counts_by_Sex__Age__and_State_Pneumonia_Influenza_or_COVID-19_Deaths_Analysis.csv', 'w', newline='') as f:
+with open('data/Provisional_COVID-19_Death_Counts_by_Sex__Age__and_State_Pneumonia_Influenza_or_COVID-19_Deaths_Analysis.csv', 'w', newline='') as f:
     writer = csv.writer(f)
     writer.writerow(header)
     writer.writerows(results_array)
 
 performstats(total_deaths_array)
-with open('Provisional_COVID-19_Death_Counts_by_Sex__Age__and_State_Total_Deaths_Analysis.csv', 'w', newline='') as f:
+with open('data/Provisional_COVID-19_Death_Counts_by_Sex__Age__and_State_Total_Deaths_Analysis.csv', 'w', newline='') as f:
     writer = csv.writer(f)
     writer.writerow(header)
     writer.writerows(results_array)
