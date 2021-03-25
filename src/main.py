@@ -48,7 +48,6 @@ sex_age_state_dataset_filepath = os.path.join(os.getcwd(), "data/Provisional_COV
 
 data = pd.read_csv(sex_age_state_dataset_filepath)
 
-# Program works up to here
 # --------------- For Provisional COVID-19 Death Counts by Sex, Age, and State dataset ---------------
 data.rename(columns={"Age Group": "Age_Group"}, inplace = True)
 
@@ -153,3 +152,7 @@ with open('data/Provisional_COVID-19_Death_Counts_by_Sex__Age__and_State_Total_D
     writer.writerows(results_array)
 
 # ---------------------------------------------------------------------------------------------------------
+
+data = pd.read_csv(contributing_conditions_dataset_filepath)
+
+# --------------- For Conditions contributing to deaths dataset ---------------
