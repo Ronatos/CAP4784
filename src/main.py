@@ -95,10 +95,12 @@ def performstats(input):
     for x in range(len(input)):
         y = []
         y.append(age_groups.get(x))
-        #Median
-        y.append(np.nanmedian(input[x].values.tolist()))
         #Mean
         y.append(np.nanmean(input[x].values.tolist()))
+        #Median
+        y.append(np.nanmedian(input[x].values.tolist()))
+        #Mode
+        y.append(stats.mode(input[x].values.tolist()).mode[0])
         #Range
         y.append(np.ptp(input[x].values.tolist()))
         #Variance
@@ -112,7 +114,7 @@ def performstats(input):
         results_array.append(y)
 
 #Testing CSV file write
-header = ['Median', 'Mean', 'Range', 'Variance', '1st Quartile', '3rd Quartile', 'Standard Deviation']
+header = ['', 'Mean', 'Median', 'Mode', 'Range', 'Variance', '1st Quartile', '3rd Quartile', 'Standard Deviation']
 
 performstats(covid_deaths_array)
 with open('data/Provisional_COVID-19_Death_Counts_by_Sex__Age__and_State_COVID-19_Deaths_Analysis.csv', 'w', newline='') as f:
