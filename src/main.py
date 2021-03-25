@@ -35,7 +35,7 @@
 #                 Add it to the relevant Age Group column in the Quartile n row in the relevant _Analysis.csv file generated for this data set
 #             Determine standard deviation of this set
 #             Add it to the relevant Age Group column in the Standard Deviation row in the relevant _Analysis.csv file generated for this data set
-
+#%%
 import numpy as np
 import os
 import pandas as pd
@@ -43,9 +43,7 @@ import csv
 from scipy import stats
 
 # Consult README.md for instructions setting up the data folder
-contributing_conditions_dataset_filepath = os.path.join(os.getcwd(), "data/Conditions_contributing_to_deaths_involving_coronavirus_disease_2019__COVID-19___by_age_group_and_state__United_States..csv")
 sex_age_state_dataset_filepath = os.path.join(os.getcwd(), "data/Provisional_COVID-19_Death_Counts_by_Sex__Age__and_State.csv")
-
 data = pd.read_csv(sex_age_state_dataset_filepath)
 
 # --------------- For Provisional COVID-19 Death Counts by Sex, Age, and State dataset ---------------
@@ -87,6 +85,7 @@ for x in range(len(age_groups)):
     pneumonia_and_covid_deaths_array.append(data.loc[(data.Group == 'By Total') & (data.State != 'United States') & (data.Sex == 'All Sexes') & (data.Age_Group == age_groups.get(x))].loc[:, 'Pneumonia and COVID-19 Deaths'])
     pneumonia_influenza_or_covid_array.append(data.loc[(data.Group == 'By Total') & (data.State != 'United States') & (data.Sex == 'All Sexes') & (data.Age_Group == age_groups.get(x))].loc[:, 'Pneumonia, Influenza, or COVID-19 Deaths'])
     total_deaths_array.append(data.loc[(data.Group == 'By Total') & (data.State != 'United States') & (data.Sex == 'All Sexes') & (data.Age_Group == age_groups.get(x))].loc[:, 'Total Deaths'])
+    
 
 def performstats(input):
     global results_array
@@ -114,6 +113,8 @@ def performstats(input):
 
 #Testing CSV file write
 header = ['', 'Mean', 'Median', 'Mode', 'Range', 'Variance', '1st Quartile', '3rd Quartile', 'Standard Deviation']
+
+print(covid_deaths_array)
 
 performstats(covid_deaths_array)
 with open('data/Provisional_COVID-19_Death_Counts_by_Sex__Age__and_State_COVID-19_Deaths_Analysis.csv', 'w', newline='') as f:
@@ -152,7 +153,75 @@ with open('data/Provisional_COVID-19_Death_Counts_by_Sex__Age__and_State_Total_D
     writer.writerows(results_array)
 
 # ---------------------------------------------------------------------------------------------------------
+#%%
+import numpy as np
+import os
+import pandas as pd
+import csv
+from scipy import stats
 
+contributing_conditions_dataset_filepath = os.path.join(os.getcwd(), "data/Conditions_contributing_to_deaths_involving_coronavirus_disease_2019__COVID-19___by_age_group_and_state__United_States..csv")
 data = pd.read_csv(contributing_conditions_dataset_filepath)
 
 # --------------- For Conditions contributing to deaths dataset ---------------
+
+data.rename(columns={"Age Group": "Age_Group"}, inplace = True)
+
+age_groups = {
+    0: '0-24',
+    1: '25-34',
+    2: '35-44',
+    3: '45-54',
+    4: '55-64',
+    5: '65-74',
+    6: '75-84',
+    7: '85+',
+    8: 'Not Stated',
+    9: 'All Ages'
+}
+
+covid_deaths_array = []
+results_array = []
+
+for x in range(0,len(age_groups)):
+    covid_deaths_array.append(data.loc[(data.Group == 'By Total') & (data.State != 'United States') & (data.Age_Group == age_groups.get(x))].loc[:, 'COVID-19 Deaths'])
+    #print(data.loc[(data.Group == 'By Total') & (data.State != 'United States') & (data.Age_Group == age_groups.get(x))].loc[:, 'COVID-19 Deaths'])
+    
+def performstats(input):
+    global results_array
+    results_array = []
+    for x in range(len(input)):
+        #print("row",x,": ",input[x])
+        y = []
+        y.append(age_groups.get(x))
+        #Mean
+        y.append(np.nanmean(input[x].values.tolist()))
+        #Median
+        y.append(np.nanmedian(input[x].values.tolist()))
+        #Mode
+        y.append(stats.mode(input[x].values.tolist()).mode[0])
+        #Range
+        y.append(np.ptp(input[x].values.tolist()))
+        #Variance
+        y.append(np.nanvar(input[x].values.tolist()))
+        #First Quartile
+        y.append(np.nanmedian(input[x].quantile(.25)))
+        #Third Quartile
+        y.append(np.nanmedian(input[x].quantile(.75)))
+        #Standard Deviation
+        y.append(np.nanstd(input[x].values.tolist()))
+        results_array.append(y)
+
+#Testing CSV file write
+header = ['', 'Mean', 'Median', 'Mode', 'Range', 'Variance', '1st Quartile', '3rd Quartile', 'Standard Deviation']
+
+#print(covid_deaths_array)
+
+performstats(covid_deaths_array)
+with open('data/Conditions_contributing_to_deaths_involving_coronavirus_disease_2019__COVID-19___by_age_group_and_state__United_States._Analysis.csv', 'w', newline='') as f:
+    writer = csv.writer(f)
+    writer.writerow(header)
+    writer.writerows(results_array)
+
+    
+# %%
