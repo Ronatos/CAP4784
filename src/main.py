@@ -114,8 +114,6 @@ def performstats(input):
 #Testing CSV file write
 header = ['', 'Mean', 'Median', 'Mode', 'Range', 'Variance', '1st Quartile', '3rd Quartile', 'Standard Deviation']
 
-print(covid_deaths_array)
-
 performstats(covid_deaths_array)
 with open('data/Provisional_COVID-19_Death_Counts_by_Sex__Age__and_State_COVID-19_Deaths_Analysis.csv', 'w', newline='') as f:
     writer = csv.writer(f)
@@ -159,6 +157,7 @@ import os
 import pandas as pd
 import csv
 from scipy import stats
+import warnings 
 
 contributing_conditions_dataset_filepath = os.path.join(os.getcwd(), "data/Conditions_contributing_to_deaths_involving_coronavirus_disease_2019__COVID-19___by_age_group_and_state__United_States..csv")
 data = pd.read_csv(contributing_conditions_dataset_filepath)
@@ -166,6 +165,7 @@ data = pd.read_csv(contributing_conditions_dataset_filepath)
 # --------------- For Conditions contributing to deaths dataset ---------------
 
 data.rename(columns={"Age Group": "Age_Group"}, inplace = True)
+data.rename(columns={"COVID-19 Deaths": "COVID19_Deaths"}, inplace = True)
 
 age_groups = {
     0: '0-24',
@@ -184,14 +184,12 @@ covid_deaths_array = []
 results_array = []
 
 for x in range(0,len(age_groups)):
-    covid_deaths_array.append(data.loc[(data.Group == 'By Total') & (data.State != 'United States') & (data.Age_Group == age_groups.get(x))].loc[:, 'COVID-19 Deaths'])
-    #print(data.loc[(data.Group == 'By Total') & (data.State != 'United States') & (data.Age_Group == age_groups.get(x))].loc[:, 'COVID-19 Deaths'])
+    covid_deaths_array.append(data.loc[(data.Group == 'By Total') & (data.State != 'United States') & (data.Age_Group == age_groups.get(x))].loc[:, 'COVID19_Deaths'])
     
 def performstats(input):
     global results_array
     results_array = []
     for x in range(len(input)):
-        #print("row",x,": ",input[x])
         y = []
         y.append(age_groups.get(x))
         #Mean
@@ -199,9 +197,17 @@ def performstats(input):
         #Median
         y.append(np.nanmedian(input[x].values.tolist()))
         #Mode
-        y.append(stats.mode(input[x].values.tolist()).mode[0])
+        try:
+            y.append(stats.mode(input[x].values.tolist()).mode[0])
+        except (IndexError, ValueError):
+            print('Empty mean set')
+            y.append(np.nan)
         #Range
-        y.append(np.ptp(input[x].values.tolist()))
+        try:
+            y.append(np.ptp(input[x].values.tolist()))
+        except (IndexError, ValueError):
+            print('Empty range set')
+            y.append(np.nan) 
         #Variance
         y.append(np.nanvar(input[x].values.tolist()))
         #First Quartile
@@ -214,8 +220,6 @@ def performstats(input):
 
 #Testing CSV file write
 header = ['', 'Mean', 'Median', 'Mode', 'Range', 'Variance', '1st Quartile', '3rd Quartile', 'Standard Deviation']
-
-#print(covid_deaths_array)
 
 performstats(covid_deaths_array)
 with open('data/Conditions_contributing_to_deaths_involving_coronavirus_disease_2019__COVID-19___by_age_group_and_state__United_States._Analysis.csv', 'w', newline='') as f:
