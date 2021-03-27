@@ -185,11 +185,15 @@ results_array = []
 
 for x in range(0,len(age_groups)):
     covid_deaths_array.append(data.loc[(data.Group == 'By Total') & (data.State != 'United States') & (data.Age_Group == age_groups.get(x))].loc[:, 'COVID19_Deaths'])
-    
+
 def performstats(input):
     global results_array
     results_array = []
     for x in range(len(input)):
+        #supressing Runtime Warnings caused by blank rows of data, blank rows are being ignored in calulations
+        warnings.filterwarnings(action='ignore', message='Mean of empty slice')
+        warnings.filterwarnings(action='ignore', message='Degrees of freedom <= 0 for slice.')
+        warnings.filterwarnings(action='ignore', message='All-NaN slice encountered')
         y = []
         y.append(age_groups.get(x))
         #Mean
@@ -200,13 +204,13 @@ def performstats(input):
         try:
             y.append(stats.mode(input[x].values.tolist()).mode[0])
         except (IndexError, ValueError):
-            print('Empty mean set')
             y.append(np.nan)
         #Range
         try:
-            y.append(np.ptp(input[x].values.tolist()))
+            #mask function excludes corresponding element from computation, in this case Nan's (blanks)
+            a = input[x].values.tolist()
+            y.append(np.ptp(np.ma.array(a, mask=np.isnan(a))))
         except (IndexError, ValueError):
-            print('Empty range set')
             y.append(np.nan) 
         #Variance
         y.append(np.nanvar(input[x].values.tolist()))
